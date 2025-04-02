@@ -1,4 +1,6 @@
-:root {
+@import "tailwindcss";
+
+/* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -65,4 +67,30 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+} */
+
+
+/* Reset some default styles */
+body {
+  @apply bg-gray-50 m-0 p-0 min-h-screen w-full;
+  display: block; /* Override the flex display that might cause centering issues */
+}
+
+#root {
+  @apply w-full min-h-screen;
+}
+
+/* Fix layout issues */
+a {
+  @apply text-blue-600 hover:text-blue-800;
+  text-decoration: none;
+}
+
+button {
+  @apply rounded-md border border-transparent;
+}
+
+/* Fix for UserView component */
+.user-view-container {
+  @apply max-w-3xl mx-auto px-4 py-8;
 }
