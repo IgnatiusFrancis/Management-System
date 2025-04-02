@@ -1,5 +1,5 @@
 import { Authentication } from "../../../domain/usecases/authentication";
-import { AccountMongoRepository } from "../../../infra/repositories/user-repository/user";
+import { MongoUserRepository } from "../../../infra/repositories/user-repository/user";
 import {
   AuthenticationError,
   NotFoundError,
@@ -8,12 +8,12 @@ import { TokenGenerator } from "../../protocols/token-generator";
 import { Encrypter, UserDocument } from "../user/protocols";
 
 export class DbAuthentication implements Authentication {
-  private readonly accountRepository: AccountMongoRepository;
+  private readonly accountRepository: MongoUserRepository;
   private readonly encrypter: Encrypter;
   private readonly tokenGenerator: TokenGenerator;
 
   constructor(
-    accountRepository: AccountMongoRepository,
+    accountRepository: MongoUserRepository,
     encrypter: Encrypter,
     tokenGenerator: TokenGenerator
   ) {

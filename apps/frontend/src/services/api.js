@@ -17,6 +17,7 @@ export const getUsers = async (page = 1, limit = 10, search = '') => {
 };
 
 export const getUser = async (id) => {
+  console.log('Fetching user with ID:', id);
   const response = await api.get(`/users/${id}`);
   return response.data;
 };

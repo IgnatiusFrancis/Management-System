@@ -53,8 +53,7 @@ export class MongoUserRepository implements UserRepository {
 
   async findByEmail(email: string): Promise<UserDocument | null> {
     try {
-      const user = await UserModel.findOne({ email });
-      return user;
+      return await UserModel.findOne({ email });
     } catch (error) {
       logger.error({
         message: "Database error while finding account by email",
@@ -73,18 +72,7 @@ export class MongoUserRepository implements UserRepository {
 
   async findById(id: string): Promise<UserDocument | null> {
     try {
-      const user = await UserModel.findById(id);
-
-      if (!user) {
-        throw new NotFoundError({
-          message: "User not found",
-          resource: "user",
-          code: "USER_NOT_FOUND",
-          metadata: { userId: id },
-        });
-      }
-
-      return user;
+      return await UserModel.findById(id);
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;
@@ -181,7 +169,6 @@ export class MongoUserRepository implements UserRepository {
 
   async deleteUser(id: string): Promise<void> {
     try {
-      await this.findById(id);
       await UserModel.findByIdAndDelete(id);
     } catch (error) {
       logger.error({

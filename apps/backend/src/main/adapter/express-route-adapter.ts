@@ -1,3 +1,8 @@
+import {
+  AuthenticationError,
+  NotFoundError,
+  ServerError,
+} from "../../presentation/errors";
 import { Controller } from "../../presentation/protocols";
 import { Request, Response } from "express";
 
@@ -34,7 +39,36 @@ export const adaptRoute = (controller: Controller) => {
     } catch (error) {
       console.error("Uncaught error in route adapter:", error);
 
-      // Return a 500 error if something unexpected happens
+      // Custom error handling for NotFoundError and ServerError
+      if (error instanceof NotFoundError) {
+        return res.status(404).json({
+          error: {
+            type: "NOT_FOUND",
+            message: error.message,
+            code: error.code,
+          },
+        });
+      }
+
+      if (error instanceof ServerError) {
+        return res.status(400).json({
+          error: {
+            type: "SERVER",
+            message: error.message,
+            code: error.code,
+          },
+        });
+      }
+      if (error instanceof AuthenticationError) {
+        return res.status(401).json({
+          error: {
+            type: "AUTHENTICATION",
+            message: error.message,
+            code: error.code,
+          },
+        });
+      }
+
       return res.status(500).json({
         error: {
           type: "SERVER",
