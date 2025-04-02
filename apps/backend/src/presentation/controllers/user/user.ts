@@ -1,5 +1,5 @@
 // presentation/controllers/user/user.ts
-import { NotFoundError, ServerError } from "../../errors";
+import { ConflictError, NotFoundError, ServerError } from "../../errors";
 import { success } from "../../helpers/http-helpers";
 import { Controller, HttpRequest, HttpResponse, User } from "./user-protocols";
 
@@ -15,6 +15,8 @@ export class UserController implements Controller {
             : this.listUsers(httpRequest);
         case "PUT":
           return this.updateUser(httpRequest);
+        case "POST":
+          return this.addUser(httpRequest);
         case "DELETE":
           return this.deleteUser(httpRequest);
         default:
@@ -24,6 +26,25 @@ export class UserController implements Controller {
             code: "INAPPROPRIATE_METHOD",
           });
       }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private async addUser(req: HttpRequest): Promise<HttpResponse> {
+    try {
+      const user = await this.user.findByEmail(req.body.email);
+
+      if (user) {
+        throw new ConflictError({
+          message: "User already exists",
+          resource: "user",
+          code: "USER_ALREADY_EXISTS",
+          metadata: { user: user },
+        });
+      }
+      const updatedUser = await this.user.addUser(req.body);
+      return success(updatedUser);
     } catch (error) {
       throw error;
     }

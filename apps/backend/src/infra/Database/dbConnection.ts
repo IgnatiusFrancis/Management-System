@@ -4,7 +4,7 @@ import env from "../../main/config/env";
 export const connectDB = async () => {
   try {
     await mongoose.connect(env.mongoUrl, {
-      dbName: "sale-system",
+      dbName: "user-management",
     });
 
     console.log("✅ MongoDB connected successfully");

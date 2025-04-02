@@ -5,20 +5,19 @@ import { UserDocument } from "../models/user";
 export interface AddUserModel {
   name: string;
   email: string;
-  password: string;
-  role: "admin" | "user";
+  role: "admin" | "user" | "editor";
 }
 
 export interface UpdateUserModel {
   name?: string;
   email?: string;
-  password?: string;
-  role?: "admin" | "user";
+  role: "admin" | "user" | "editor";
 }
 
 export interface User {
-  add(account: AddUserModel): Promise<UserDocument>;
+  addUser(data: AddUserModel): Promise<UserDocument>;
   findById?(id: string): Promise<UserDocument | null>;
+  findByEmail?(id: string): Promise<UserDocument | null>;
   listUsers?({
     page,
     limit,

@@ -1,5 +1,5 @@
 import {
-  AuthenticationError,
+  ConflictError,
   NotFoundError,
   ServerError,
 } from "../../presentation/errors";
@@ -50,19 +50,20 @@ export const adaptRoute = (controller: Controller) => {
         });
       }
 
-      if (error instanceof ServerError) {
-        return res.status(400).json({
+      if (error instanceof ConflictError) {
+        return res.status(409).json({
           error: {
-            type: "SERVER",
+            type: "CONFLICT",
             message: error.message,
             code: error.code,
           },
         });
       }
-      if (error instanceof AuthenticationError) {
-        return res.status(401).json({
+
+      if (error instanceof ServerError) {
+        return res.status(400).json({
           error: {
-            type: "AUTHENTICATION",
+            type: "SERVER",
             message: error.message,
             code: error.code,
           },

@@ -4,14 +4,14 @@ export interface UserDocument extends Document {
   id: string;
   name: string;
   email: string;
-  password: string;
-  role: "admin" | "user";
+  role: "admin" | "user" | "editor";
   accessToken?: string;
 }
 
 export enum UserRole {
   ADMIN = "admin",
   USER = "user",
+  EDITOR = "editor",
 }
 
 const UserSchema = new Schema<UserDocument>(
@@ -25,11 +25,6 @@ const UserSchema = new Schema<UserDocument>(
       lowercase: true,
       trim: true,
       match: /.+@.+\..+/,
-    },
-    password: {
-      type: String,
-      required: true,
-      minlength: 2,
     },
     role: {
       type: String,

@@ -4,7 +4,7 @@ const UserForm = ({ user, onSubmit, isLoading }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    // Add other fields as necessary
+    role: "",
   });
 
   useEffect(() => {
@@ -12,7 +12,7 @@ const UserForm = ({ user, onSubmit, isLoading }) => {
       setFormData({
         name: user.name || "",
         email: user.email || "",
-        // Set other fields
+        role: user.role || "",
       });
     }
   }, [user]);
@@ -68,7 +68,25 @@ const UserForm = ({ user, onSubmit, isLoading }) => {
         />
       </div>
 
-      {/* Add other form fields as needed */}
+      <div className="mb-4">
+        <label
+          className="block text-sm font-medium text-gray-700 mb-1"
+          htmlFor="email"
+        >
+          Role
+        </label>
+        <select
+          id="role"
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        >
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+          <option value="editor">Editor</option>
+        </select>
+      </div>
 
       <div className="mt-6">
         <button

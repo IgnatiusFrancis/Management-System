@@ -10,7 +10,7 @@ import {
 import logger from "../../../utils/logger";
 
 export class MongoUserRepository implements UserRepository {
-  async add(accountData: AddUserModel): Promise<UserDocument> {
+  async addUser(accountData: AddUserModel): Promise<UserDocument> {
     try {
       // Check if account with email already exists
       const existingAccount = await UserModel.findOne({

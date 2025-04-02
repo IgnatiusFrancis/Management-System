@@ -16,6 +16,9 @@ const UserTable = ({ users, onDelete }) => {
               Email
             </th>
             <th className="px-6 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+              Role
+            </th>
+            <th className="px-6 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
               Actions
             </th>
           </tr>
@@ -24,7 +27,7 @@ const UserTable = ({ users, onDelete }) => {
           {users.map((user) => (
             <tr key={user.id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                {user.id}
+                {user._id}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                 {user.name}
@@ -32,21 +35,24 @@ const UserTable = ({ users, onDelete }) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                 {user.email}
               </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                {user.role}
+              </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 space-x-2">
                 <Link
-                  to={`/users/${user.id}`}
+                  to={`/users/${user._id}`}
                   className="text-blue-600 hover:text-blue-800"
                 >
                   View
                 </Link>
                 <Link
-                  to={`/users/${user.id}/edit`}
+                  to={`/users/${user._id}/edit`}
                   className="text-green-600 hover:text-green-800"
                 >
                   Edit
                 </Link>
                 <button
-                  onClick={() => onDelete(user.id)}
+                  onClick={() => onDelete(user._id)}
                   className="text-red-600 hover:text-red-800"
                 >
                   Delete

@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
-import { getUsers, deleteUser } from "../services/api";
+import { useState, useEffect, useCallback } from "react";
+import { getUsers, deleteUser, addUser } from "../services/api";
 import SearchBar from "../components/SearchBar";
 import UserTable from "../components/UserTable";
 import Pagination from "../components/Pagination";
+import AddUserModal from "../components/AddUserModal";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -12,25 +13,39 @@ const UserList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [limit] = useState(10);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchUsers = async () => {
+  // Using useCallback to prevent unnecessary re-creation of this function
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getUsers(currentPage, limit, searchTerm);
-      setUsers(data.users || []);
-      setTotalPages(data.totalPages || 1);
       setError(null);
+
+      const data = await getUsers(currentPage, limit, searchTerm);
+
+      // More robust handling of API response
+      if (data && Array.isArray(data.users)) {
+        setUsers(data.users);
+        setTotalPages(
+          Math.max(1, data.totalPages || Math.ceil(data.total / limit) || 1)
+        );
+      } else {
+        setUsers([]);
+        setTotalPages(1);
+        setError("Invalid data format received from server");
+      }
     } catch (err) {
-      setError("Failed to fetch users");
-      console.error(err);
+      setUsers([]);
+      setError(err?.message || "Failed to fetch users");
+      console.error("Error fetching users:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, limit, searchTerm]);
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, searchTerm]);
+  }, [fetchUsers]);
 
   const handleSearch = (term) => {
     setSearchTerm(term);
@@ -38,18 +53,66 @@ const UserList = () => {
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page !== currentPage && page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   const handleDelete = async (id) => {
+    if (!id) return;
+
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
+        setError(null);
         await deleteUser(id);
-        fetchUsers();
+
+        // If we're on a page that would be empty after deletion, go to previous page
+        const isLastItemOnPage = users.length === 1 && currentPage > 1;
+        if (isLastItemOnPage) {
+          setCurrentPage((prev) => prev - 1);
+        } else {
+          fetchUsers();
+        }
       } catch (err) {
-        setError("Failed to delete user");
-        console.error(err);
+        setError(err?.message || "Failed to delete user");
+        console.error("Error deleting user:", err);
       }
+    }
+  };
+
+  const handleAddUser = async (userData) => {
+    if (!userData) return false;
+
+    try {
+      setError(null);
+      await addUser(userData);
+      setIsModalOpen(false);
+
+      // If adding to first page or on first page, refresh the list
+      if (currentPage === 1) {
+        fetchUsers();
+      } else {
+        // Otherwise go to first page to see the new user
+        setCurrentPage(1);
+      }
+      return true;
+    } catch (err) {
+      const errorMessage =
+        err?.response?.data?.error?.message ||
+        err?.message ||
+        "Failed to add user";
+      setError(errorMessage);
+      console.error("Error adding user:", err);
+      return false;
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    // Clear error when closing modal
+    if (error && error.includes("add")) {
+      setError(null);
     }
   };
 
@@ -57,6 +120,12 @@ const UserList = () => {
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Users</h1>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors"
+        >
+          Add User
+        </button>
       </div>
 
       <SearchBar onSearch={handleSearch} />
@@ -76,18 +145,31 @@ const UserList = () => {
         </div>
       ) : users.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-600">No users found</p>
+          <p className="text-gray-600">
+            {searchTerm
+              ? `No users found matching "${searchTerm}"`
+              : "No users found"}
+          </p>
         </div>
       ) : (
         <>
           <UserTable users={users} onDelete={handleDelete} />
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
         </>
       )}
+
+      <AddUserModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onAddUser={handleAddUser}
+        error={error}
+      />
     </div>
   );
 };

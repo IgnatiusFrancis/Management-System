@@ -35,6 +35,7 @@ const UserEdit = () => {
       await updateUser(id, formData);
       navigate(`/users/${id}`);
     } catch (err) {
+      console.log(err);
       setError("Failed to update user");
       console.error(err);
       setSaving(false);
