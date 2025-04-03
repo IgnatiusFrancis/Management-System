@@ -120,7 +120,14 @@ export class MongoUserRepository implements UserRepository {
   }> {
     try {
       // Construct the query based on the search text
-      const query = search ? { $text: { $search: search } } : {};
+      const query = search
+        ? {
+            $or: [
+              { name: { $regex: search, $options: "i" } },
+              { email: { $regex: search, $options: "i" } },
+            ],
+          }
+        : {};
 
       const users = await UserModel.find(query)
         .skip((page - 1) * limit)
