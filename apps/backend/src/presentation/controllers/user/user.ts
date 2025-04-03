@@ -33,16 +33,7 @@ export class UserController implements Controller {
 
   private async addUser(req: HttpRequest): Promise<HttpResponse> {
     try {
-      const user = await this.user.findByEmail(req.body.email);
-
-      if (user) {
-        throw new ConflictError({
-          message: "User already exists",
-          resource: "user",
-          code: "USER_ALREADY_EXISTS",
-          metadata: { user: user },
-        });
-      }
+      await this.getUserByEmail(req);
       const updatedUser = await this.user.addUser(req.body);
       return success(updatedUser);
     } catch (error) {
@@ -85,10 +76,46 @@ export class UserController implements Controller {
     }
   }
 
+  private async getUserByEmail(req: HttpRequest): Promise<HttpResponse> {
+    try {
+      const user = await this.user.findByEmail(req.body.email);
+
+      if (user) {
+        throw new ConflictError({
+          message: "User already exists",
+          resource: "user",
+          code: "USER_ALREADY_EXISTS",
+          metadata: { user: user },
+        });
+      }
+
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   private async updateUser(req: HttpRequest): Promise<HttpResponse> {
     try {
-      await this.getUser(req);
+      // Get the current user by ID
+      const currentUser = await this.user.findById(req.params.id);
+
+      // Check if the email provided in the request body already exists (but not the same as current user's email)
+      if (req.body.email && req.body.email !== currentUser.email) {
+        const existingUser = await this.getUserByEmail(req);
+
+        if (existingUser) {
+          throw new ConflictError({
+            message: "Email is already in use by another account.",
+            resource: "user",
+            code: "USER_ALREADY_EXISTS",
+            metadata: { user: existingUser },
+          });
+        }
+      }
+
       const updatedUser = await this.user.updateUser(req.params.id, req.body);
+
       return success(updatedUser);
     } catch (error) {
       throw error;
