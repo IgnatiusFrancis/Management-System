@@ -6,7 +6,10 @@ import cors from "cors";
 export const setupMiddlewares = (app: Express): void => {
   app.use(
     cors({
-      origin: ["http://localhost:3000", "http://localhost:5173"],
+      origin: [
+        "https://management-system-frontend-azure.vercel.app",
+        "http://localhost:5173",
+      ],
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
     })
