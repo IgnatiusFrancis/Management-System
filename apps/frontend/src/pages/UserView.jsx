@@ -33,7 +33,12 @@ const UserView = () => {
         await deleteUser(id);
         navigate("/users");
       } catch (err) {
-        setError("Failed to delete user");
+        const errorMessage =
+          err?.response?.data?.error?.message ||
+          err?.message ||
+          "Failed to delete user";
+        setError(errorMessage);
+
         console.error(err);
       }
     }

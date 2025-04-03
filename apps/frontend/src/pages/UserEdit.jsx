@@ -36,7 +36,11 @@ const UserEdit = () => {
       navigate(`/users/${id}`);
     } catch (err) {
       console.log(err);
-      setError("Failed to update user");
+      const errorMessage =
+        err?.response?.data?.error?.message ||
+        err?.message ||
+        "Failed to update user";
+      setError(errorMessage);
       console.error(err);
       setSaving(false);
     }
