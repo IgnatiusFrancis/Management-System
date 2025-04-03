@@ -1,3 +1,4 @@
+//Build script: "build": "rimraf dist && tsc --project tsconfig.build.json",
 import { connectDB } from "../infra/Database/dbConnection";
 import env from "./config/env";
 

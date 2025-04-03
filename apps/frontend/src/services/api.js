@@ -1,4 +1,3 @@
-// "build": "rimraf dist && tsc --project tsconfig.build.json",
 
 import axios from 'axios';
 
